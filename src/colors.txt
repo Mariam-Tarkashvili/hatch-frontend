@@ -1,0 +1,4 @@
+rgb(20, 20, 20) - background
+
+#5cddfd - logo
+#a7c1e3 - hover

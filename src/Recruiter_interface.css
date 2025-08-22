@@ -1,0 +1,192 @@
+/* reset */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.recruiter_container {
+  height: 100vh;
+  width: 100vw;
+  background-color: rgb(20, 20, 20);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.first_layer {
+  width: 97.5%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  margin-left: 20px;
+}
+
+.recruiter_logo {
+  width: 60px;
+}
+
+.hatch {
+  color: rgb(165, 165, 165);
+  font-size: 45px;
+}
+
+.second_layer {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  overflow-y: auto;
+  width: 80%;
+  margin-left: 10%;
+  margin-right: 10%;
+}
+
+.messages_placeholder {
+  color: #5cddfd;
+  font-weight: 100;
+}
+
+.messages_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 80%;
+}
+
+.message_box {
+  max-width: 70%;
+  padding: 10px 15px;
+  border-radius: 15px;
+  word-wrap: break-word;
+  font-size: 16px;
+  color: white;
+}
+
+.user_msg {
+  align-self: flex-end;
+  background: #5cddfd;
+  color: black;
+}
+
+.bot_msg {
+  align-self: flex-start;
+  background: #333;
+  border: 1px solid #5cddfd;
+}
+
+.file_name {
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: white;
+}
+
+.file_preview {
+  max-width: 200px;
+  border-radius: 8px;
+  margin-top: 5px;
+}
+
+/* Input area */
+.third_layer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.input_wrapper {
+  display: flex;
+  align-items: center;
+  background: #111;
+  border: 1px solid #5cddfd;
+  border-radius: 25px;
+  padding: 5px 10px;
+  width: 50%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.recruiter_input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 10px;
+  color: white;
+  font-size: 16px;
+}
+
+.recruiter_input::placeholder {
+  color: rgb(165, 165, 165);
+}
+
+.icon_button {
+  background: none;
+  border: none;
+  color: #5cddfd;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.icon_button:hover {
+  color: #23a6d5;
+  transform: scale(1.1);
+}
+
+.drag_active {
+  border: 3px dashed #5cddfd;
+  background-color: rgb(47, 48, 48);
+}
+
+/* Second layer already scrollable */
+.second_layer {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Wrapper for messages */
+.messages_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 80%;
+}
+
+/* Scrollbar styling (Chrome, Edge, Safari) */
+.second_layer::-webkit-scrollbar {
+  width: 8px;   /* make it thin */
+}
+
+.second_layer::-webkit-scrollbar-track {
+  background: transparent; /* no background */
+}
+
+.second_layer::-webkit-scrollbar-thumb {
+  background: #5cddfd;   /* your chosen color */
+  border-radius: 10px;
+}
+
+.second_layer::-webkit-scrollbar-thumb:hover {
+  background: #23a6d5;   /* hover color */
+}
+
+/* Firefox */
+.second_layer {
+  scrollbar-width: thin;              /* makes it thinner */
+  scrollbar-color: #5cddfd transparent;  /* thumb color + no track */
+}
+
+.Sign_out{
+  font-size: 20px;
+}
+
+.dropdown_container{
+  background-color: rgb(20, 20, 20);
+
+}

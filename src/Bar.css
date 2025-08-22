@@ -1,0 +1,67 @@
+.bar{
+display:flex;
+flex-direction: row;
+justify-content: space-between;
+align-items: center;
+background-color: rgb(20, 20, 20);
+border-bottom: 2px solid #5cddfd;
+width: 100%;
+}
+
+.worker_logo{
+    width: 50px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    margin-left: 10px;
+}
+
+.bar_options_container{
+    width: 20%;
+    display: flex;
+    flex-direction: row;
+justify-content: space-between;
+align-items: center;
+margin-right: 40px;
+}
+
+.bar_logo_container{
+       width: 12%;
+    display: flex;
+    flex-direction: row;
+justify-content: space-around;
+align-items: center;
+margin-right: 40px; 
+}
+.worker_hatch{
+    color:white;
+}
+
+.Reader{
+    color: #5cddfd;
+}
+.Reader:hover{
+    color: #a7c1e3;
+}
+
+.Sign_out{
+    color:#5cddfd;
+}
+
+.Sign_out:hover{
+    color:#a7c1e3;
+}
+
+.worker_text_title{
+color:#5cddfd;
+}
+
+.worker_text_content{
+     color: rgb(165, 165, 165);
+     border: 1px solid #5cddfd;
+}
+.reader_text{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 30px;
+}
