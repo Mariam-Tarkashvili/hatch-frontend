@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 import './Login_page.css'
 
 const Login_page = () => {
@@ -8,33 +9,38 @@ const Login_page = () => {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  // Define login credentials
+  // Hardcoded creds with mapped roles
   const credentials = {
     'recruiter@company.com': { password: 'recruiter123', route: '/recruiter' },
-    'worker1@company.com': { password: 'worker123', route: '/worker/1' },
-    'worker2@company.com': { password: 'worker456', route: '/worker/2' }
+    'worker1@company.com': { password: 'worker123', route: '/worker/1', role: 'project manager' },
+    'worker2@company.com': { password: 'worker456', route: '/worker/2', role: 'data analyst' }
   }
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
     setError('')
 
-    // Check if username exists and password matches
-    if (credentials[username] && credentials[username].password === password) {
-      // Navigate to appropriate route
-      navigate(credentials[username].route)
+    const user = credentials[username]
+    if (user && user.password === password) {
+      // If worker, notify backend about the role
+      if (user.role) {
+        try {
+          await axios.post('http://127.0.0.1:5000/update_role', { role: user.role })
+        } catch (err) {
+          console.error("Failed to update role:", err)
+        }
+      }
+      navigate(user.route)
     } else {
       setError('Invalid email or password. Please try again.')
     }
   }
-    
+
   return (
     <div className="container">
       <img src="/logo.png" alt="logo" className="logo" />
       <div className="login_container">
-        <h1 className="login_caption">
-          Log in
-        </h1>
+        <h1 className="login_caption">Log in</h1>
         <form onSubmit={handleLogin}>
           <div className="pretty_inputs">
             <input 
@@ -54,7 +60,7 @@ const Login_page = () => {
               required
             />
           </div>
-          {error && <p className="error_message" style={{color: 'white', marginTop: '2px', marginBottom:'2px', textAlign: 'start', fontSize: '10px'}}>{error}</p>}
+          {error && <p className="error_message">{error}</p>}
           <button className="login_button" type="submit">Sign in</button>
         </form>
       </div>

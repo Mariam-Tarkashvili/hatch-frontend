@@ -93,3 +93,6 @@ form{
   flex-direction: column;
   align-items: center;
 }
+.error_message{
+  color:white;
+}

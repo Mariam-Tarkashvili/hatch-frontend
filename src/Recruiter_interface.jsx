@@ -4,157 +4,263 @@ import './Recruiter_interface.css'
 
 const Recruiter_interface = () => {
   const fileInputRef = useRef(null)
-  const navigate = useNavigate() // Add this line
-  const [messages, setMessages] = useState([]) // store all chat messages
-  const [inputValue, setInputValue] = useState("") // store input text
-  const [file, setFile] = useState(null) // store selected file
+  const navigate = useNavigate()
+  const [messages, setMessages] = useState([])
+  const [inputValue, setInputValue] = useState("")
+  const [file, setFile] = useState(null)
   const [dragActive, setDragActive] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [selectedRole, setSelectedRole] = useState("")
 
-  // Open file manager
-  const handleFileButtonClick = () => {
-    fileInputRef.current.click()
+  const API_BASE_URL = 'http://127.0.0.1:5000'
+
+  // ========== API CALLS ==========
+  const updateRole = async (role) => {
+    try {
+      await fetch(`${API_BASE_URL}/update_role`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role })
+      })
+    } catch (error) {
+      console.error('Error updating role:', error)
+    }
   }
 
-  const handleSignOut = () => {
+  const saveMessage = async (message, sender, role) => {
+    try {
+      await fetch(`${API_BASE_URL}/save_message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          message: message,
+          sender: sender,
+          role: role || selectedRole || 'no_role'
+        })
+      })
+    } catch (error) {
+      console.error('Error saving message:', error)
+    }
+  }
+
+  const uploadFiles = async (fileToUpload) => {
+    try {
+      const formData = new FormData()
+      formData.append('files', fileToUpload)
+
+      const response = await fetch(`${API_BASE_URL}/upload`, {
+        method: 'POST',
+        body: formData
+      })
+
+      const data = await response.json()
+      if (data.ai_confirmation) {
+        setMessages(prev => [...prev, { type: "text", text: data.ai_confirmation, sender: "bot" }])
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error)
+    }
+  }
+
+  const chatWithAI = async (question) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/chat_for_lizi`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      })
+      const data = await response.json()
+      if (data.answer) {
+        setMessages(prev => [...prev, { type: "text", text: data.answer, sender: "bot" }])
+      }
+    } catch (error) {
+      console.error('Error chatting with AI:', error)
+    }
+  }
+
+  const finishTraining = async () => {
+    try {
+      await fetch(`${API_BASE_URL}/finish_training`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      })
+    } catch (error) {
+      console.error('Error finishing training:', error)
+    }
+  }
+
+  // ========== HANDLERS ==========
+  const handleFileButtonClick = () => fileInputRef.current.click()
+
+  const handleSignOut = async () => {
+    try {
+      // Fire-and-forget POST to /finish_training
+      await fetch("http://127.0.0.1:5000/finish_training", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({})  // empty JSON
+      });
+    } catch (err) {
+      console.error("Error finishing training:", err);
+      // we can ignore errors here if you like
+    }
+
     // Navigate back to login page
-    navigate('/')
+    navigate('/');
   }
 
-  const handleDropdownToggle = () => {
-    setDropdownOpen(!dropdownOpen)
-  }
+  const handleDropdownToggle = () => setDropdownOpen(!dropdownOpen)
 
-  const handleRoleSelect = (role) => {
+  const handleRoleSelect = async (role) => {
     setSelectedRole(role)
     setDropdownOpen(false)
+
+    const roleMapping = {
+      'Project Manager': 'project manager',
+      'Data Analyst': 'data analyst'
+    }
+
+    await updateRole(roleMapping[role])
   }
 
-  // Handle file selection
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0]
     if (selectedFile) {
       setFile(selectedFile)
-      setInputValue(selectedFile.name) // show file name in input
+      setInputValue(selectedFile.name)
     }
   }
 
-  // Drag drop handlers
-  const handleDragOver = (e) => {
-    e.preventDefault()
-    setDragActive(true)
-  }
+  const handleSend = async () => {
+    if (inputValue.trim() === "" && !file) return; // nothing to send
 
-  const handleDragLeave = (e) => {
-    e.preventDefault()
-    setDragActive(false)
-  }
+    let newMessages = [...messages];
 
-  const handleDrop = (e) => {
-    e.preventDefault()
-    setDragActive(false)
-    const droppedFile = e.dataTransfer.files[0]
-    if (droppedFile) {
-      setFile(droppedFile)
-      setInputValue(droppedFile.name)
-    }
-  }
-
-  // Send message
-  const handleSend = () => {
-    if (inputValue.trim() === "") return
-
+    // -------------------------------
+    // 1 Handle file upload
+    // -------------------------------
     if (file) {
-      // if file selected → send as file message
-      const fileUrl = URL.createObjectURL(file)
-      setMessages([
+      if (!selectedRole) {
+        alert("Please select a role before uploading files.");
+        return;
+      }
+
+      newMessages = [
         ...messages,
-        { type: "file", name: file.name, url: fileUrl, sender: "user" }
-      ])
-      setFile(null)
-    } else {
-      // send normal text
-      setMessages([...messages, { type: "text", text: inputValue, sender: "user" }])
+        { type: "file", name: file.name, url: URL.createObjectURL(file), sender: "user" }
+      ];
+      setMessages(newMessages);
+
+      // Save file upload info as message
+      await saveMessage(`File uploaded: ${file.name}`, "recruiter", selectedRole);
+
+      try {
+        const formData = new FormData();
+        formData.append("files", file);
+        formData.append("role", selectedRole); // always send current role
+
+        const response = await fetch("http://127.0.0.1:5000/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.ai_confirmation) {
+          setMessages(prev => [
+            ...prev,
+            { type: "text", text: data.ai_confirmation, sender: "bot" }
+          ]);
+        }
+
+      } catch (err) {
+        console.error("Error uploading file:", err);
+        setMessages(prev => [
+          ...prev,
+          { type: "text", text: "⚠ File upload failed. Please try again.", sender: "bot" }
+        ]);
+      }
+
+      setFile(null);
+      setInputValue("");
+      return;
     }
 
-    setInputValue("") // clear input
-  }
+    // -------------------------------
+    // 2️ Handle text messages
+    // -------------------------------
+    if (inputValue.trim() !== "") {
+      newMessages = [
+        ...messages,
+        { type: "text", text: inputValue, sender: "user" }
+      ];
+      setMessages(newMessages);
+
+      const userQuestion = inputValue;
+      
+      // Save recruiter message to Python directory
+      await saveMessage(userQuestion, "recruiter", selectedRole);
+      
+      setInputValue("");
+
+      try {
+        const response = await fetch("http://127.0.0.1:5000/chat_for_lizi", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question: userQuestion })
+        });
+
+        const data = await response.json();
+
+        if (data.answer) {
+          setMessages(prev => [
+            ...prev,
+            { type: "text", text: data.answer, sender: "bot" }
+          ]);
+        }
+
+      } catch (err) {
+        console.error("Error fetching chat response:", err);
+        setMessages(prev => [
+          ...prev,
+          { type: "text", text: "⚠️ Server error. Please try again.", sender: "bot" }
+        ]);
+      }
+    }
+  };
 
   return (
-    <div
-      className={`recruiter_container ${dragActive ? "drag_active" : ""}`}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-    >
-      {/* Top logo and title */}
+    <div className={`recruiter_container ${dragActive ? "drag_active" : ""}`}>
       <div className="first_layer">
         <img src="/logo.png" alt="logo" className="recruiter_logo" />
         <h1 className="hatch">Hatch</h1>
-        <h1 className="Sign_out" style={{ cursor: 'pointer' }} onClick={handleSignOut}>
-          Sign Out
-        </h1>
+        <h1 className="Sign_out" style={{ cursor: 'pointer' }} onClick={handleSignOut}>Sign Out</h1>
       </div>
 
-      {/* Chat area */}
       <div className="second_layer">
         {messages.length === 0 ? (
           <h1 className="messages_placeholder">What can you teach me?</h1>
         ) : (
           <div className="messages_wrapper">
             {messages.map((msg, idx) => (
-              <div
-                key={idx}
-                className={`message_box ${msg.sender === "user" ? "user_msg" : "bot_msg"}`}
-              >
+              <div key={idx} className={`message_box ${msg.sender === "user" ? "user_msg" : "bot_msg"}`}>
                 {msg.type === "text" && msg.text}
-
-                {msg.type === "file" && (
-                  <div>
-                    {/* Image preview */}
-                    {msg.url && msg.name.match(/\.(jpg|jpeg|png|gif)$/i) && (
-                      <img src={msg.url} alt={msg.name} className="file_preview" />
-                    )}
-
-                    {/* PDF preview as link */}
-                    {msg.url && msg.name.match(/\.pdf$/i) && (
-                      <a
-                        href={msg.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="pdf_link"
-                      >
-                        📄 {msg.name}
-                      </a>
-                    )}
-                  </div>
-                )}
+                {msg.type === "file" && <a href={msg.url} target="_blank" rel="noopener noreferrer">{msg.name}</a>}
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Input area */}
       <div className="third_layer">
         <div className="input_wrapper">
-          {/* Upload Button */}
           <button className="icon_button" onClick={handleFileButtonClick}>+</button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            onChange={handleFileChange}
-            accept="image/*,.pdf"
-          />
+          <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} accept=".pdf,.txt" />
 
-          {/* Role Dropdown */}
+          {/* Role Dropdown with STYLING restored */}
           <div className="dropdown_container" style={{ position: 'relative', display: 'inline-block' }}>
-            <button 
-              className="icon_button dropdown_button" 
-              onClick={handleDropdownToggle}
-            >
+            <button className="icon_button dropdown_button" onClick={handleDropdownToggle}>
               {selectedRole ? selectedRole : '▼'}
             </button>
             {dropdownOpen && (
@@ -201,17 +307,10 @@ const Recruiter_interface = () => {
             )}
           </div>
 
-          {/* Text / File Input */}
-          <input
-            className="recruiter_input"
-            type="text"
-            placeholder="Provide your company specifics"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          />
+          <input className="recruiter_input" type="text" placeholder="Provide your company specifics"
+            value={inputValue} onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()} />
 
-          {/* Send Button */}
           <button className="icon_button" onClick={handleSend}>➤</button>
         </div>
       </div>

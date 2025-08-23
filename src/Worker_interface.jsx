@@ -1,22 +1,56 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import axios from 'axios'
 import './Worker_interface.css'
 
 const Worker_interface = ({ workerId }) => {
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [messages, setMessages] = useState([
-    { text: `Hello! How can I help you${workerId ? ` (Worker ${workerId})` : ''}?`, sender: "bot" }
+    { text: "Hello! Ask me about your training material.", sender: "bot" }
   ])
-  // here should go text coming from chatbot from backend
   const [inputValue, setInputValue] = useState("")
+  const [wallText, setWallText] = useState("")
+  const [loading, setLoading] = useState(true)
   const messagesEndRef = useRef(null)
 
-  const handleSend = () => {
+  // Fetch wall of text and summarize it
+  useEffect(() => {
+    const fetchAndSummarize = async () => {
+      try {
+        // Step 1: fetch full wall of text
+        const resText = await axios.get('http://127.0.0.1:5000/get_text')
+        const fullText = resText.data.text
+
+        // Step 2: send summarization request to the chat endpoint
+        const summaryRes = await axios.post('http://127.0.0.1:5000/ask_text_reader', {
+          question: `Please summarize this onboarding/training material in 3 concise paragraphs for a new employee:\n${fullText}`
+        })
+
+        setWallText(summaryRes.data.answer)
+      } catch (err) {
+        console.error("Error fetching or summarizing text:", err)
+        setWallText("⚠️ Unable to fetch or summarize training material.")
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchAndSummarize()
+  }, [])
+
+  const handleSend = async () => {
     if (!inputValue.trim()) return
-    setMessages([...messages, { text: inputValue, sender: "user" }])
+    const newMsg = { text: inputValue, sender: "user" }
+    setMessages(prev => [...prev, newMsg])
     setInputValue("")
+
+    try {
+      const res = await axios.post('http://127.0.0.1:5000/ask_text_reader', { question: newMsg.text })
+      setMessages(prev => [...prev, { text: res.data.answer, sender: "bot" }])
+    } catch (err) {
+      console.error("Chat error:", err)
+    }
   }
 
-  // Auto-scroll to bottom when messages change
+  // Scroll chat to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
@@ -24,12 +58,12 @@ const Worker_interface = ({ workerId }) => {
   return (
     <div className="worker_container">
       <div className="reader_text">
-        <h1 className="worker_text_title">
-          {workerId ? `Worker ${workerId} Content` : 'Some Title'}
-        </h1>
-        <p className="worker_text_content">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris eget nisi ac magna aliquam efficitur. Duis ac nisl luctus, placerat justo congue, tristique massa. Phasellus euismod est ut orci congue molestie. Suspendisse non efficitur libero. Vestibulum sodales felis in eros interdum cursus. Phasellus tincidunt tortor sed libero finibus, eget consequat ex laoreet. Proin scelerisque lorem a ligula viverra, ut commodo elit laoreet. Nullam faucibus tellus vitae purus convallis mollis. Aliquam quam nibh, laoreet non auctor eu, commodo id enim. Sed vehicula quam in porttitor blandit. Proin venenatis eleifend ornare. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Nam sed ultrices nunc, a eleifend enim. Pellentesque eget nunc ipsum. Pellentesque ac neque nisi. Pellentesque convallis arcu felis, consectetur pretium sem pellentesque nec. Nunc lobortis rutrum magna, in accumsan turpis dignissim facilisis. Aliquam erat volutpat. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nam vel leo id augue scelerisque mattis a id nunc. Nulla facilisi. Etiam porttitor ipsum sit amet diam fermentum commodo. Sed ut massa pharetra, rhoncus orci eget, placerat diam. In viverra ornare enim sit amet vulputate. Sed sed lorem eget enim molestie accumsan quis a nisi. Praesent tempus urna eget malesuada sollicitudin. Proin id nisi metus. Duis eget accumsan ipsum.
-        </p>
+        <h1 className="worker_text_title">Training Material</h1>
+        {loading ? (
+          <p className="worker_text_content">Loading and summarizing material...</p>
+        ) : (
+          <p className="worker_text_content">{wallText}</p>
+        )}
       </div>
 
       {/* Chatbot Button / Box */}
@@ -37,7 +71,7 @@ const Worker_interface = ({ workerId }) => {
         {isChatOpen ? (
           <div className="chatbox">
             <div className="chatbox_header">
-              <span>Hatch</span>
+              <span>Assistant</span>
               <button onClick={() => setIsChatOpen(false)}>✕</button>
             </div>
             <div className="chatbox_body">
