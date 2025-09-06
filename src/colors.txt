@@ -2,3 +2,32 @@ rgb(20, 20, 20) - background
 
 #5cddfd - logo
 #a7c1e3 - hover
+
+rgb(165, 165, 165) - text
+
+
+  <>
+      <Bar />
+      <Worker_interface />
+    </>
+  );
+};
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        {/* Login */}
+        <Route path="/" element={<Login_page />} />
+
+        {/* Recruiter interface */}
+        <Route path="/recruiter" element={<Recruiter_interface />} />
+
+        {/* Worker interface with nested routes */}
+        <Route path="/worker/:id/*" element={<WorkerPage />}>
+          {/* Redirect /worker/:id → /worker/:id/articles */}
+          <Route index element={<Navigate to="articles" replace />} />
+          {/* The nested routes (articles, podcasts, quiz) are defined inside Worker_interface.jsx */}
+        </Route>
+      </Routes>
+    </Router>

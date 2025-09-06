@@ -16,7 +16,7 @@ width: 100%;
 }
 
 .bar_options_container{
-    width: 20%;
+    width: 15%;
     display: flex;
     flex-direction: row;
 justify-content: space-between;
@@ -38,6 +38,7 @@ margin-right: 40px;
 
 .Reader{
     color: #5cddfd;
+    font-size: 17px;
 }
 .Reader:hover{
     color: #a7c1e3;
@@ -45,6 +46,7 @@ margin-right: 40px;
 
 .Sign_out{
     color:#5cddfd;
+    font-size: 17px;
 }
 
 .Sign_out:hover{

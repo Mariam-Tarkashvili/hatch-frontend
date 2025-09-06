@@ -1,0 +1,54 @@
+{
+  "quiz": [
+    {
+      "question": "What is the capital of France?",
+      "answers": ["Paris", "Rome", "Madrid", "Berlin"],
+      "correct_answer": "Paris"
+    },
+    {
+      "question": "Which planet is known as the Red Planet?",
+      "answers": ["Venus", "Mars", "Jupiter", "Saturn"],
+      "correct_answer": "Mars"
+    },
+    {
+      "question": "Who wrote 'Hamlet'?",
+      "answers": ["William Shakespeare", "Charles Dickens", "Mark Twain", "Leo Tolstoy"],
+      "correct_answer": "William Shakespeare"
+    },
+    {
+      "question": "What is the chemical symbol for water?",
+      "answers": ["H2O", "O2", "CO2", "NaCl"],
+      "correct_answer": "H2O"
+    },
+    {
+      "question": "How many continents are there on Earth?",
+      "answers": ["5", "6", "7", "8"],
+      "correct_answer": "7"
+    },
+    {
+      "question": "Which ocean is the largest?",
+      "answers": ["Atlantic Ocean", "Indian Ocean", "Pacific Ocean", "Arctic Ocean"],
+      "correct_answer": "Pacific Ocean"
+    },
+    {
+      "question": "What is the smallest prime number?",
+      "answers": ["0", "1", "2", "3"],
+      "correct_answer": "2"
+    },
+    {
+      "question": "Which gas do humans need to breathe in order to survive?",
+      "answers": ["Carbon Dioxide", "Oxygen", "Nitrogen", "Helium"],
+      "correct_answer": "Oxygen"
+    },
+    {
+      "question": "In which country are the Pyramids of Giza located?",
+      "answers": ["Egypt", "Mexico", "Peru", "India"],
+      "correct_answer": "Egypt"
+    },
+    {
+      "question": "What is the largest mammal on Earth?",
+      "answers": ["African Elephant", "Blue Whale", "Giraffe", "Orca"],
+      "correct_answer": "Blue Whale"
+    }
+  ]
+}

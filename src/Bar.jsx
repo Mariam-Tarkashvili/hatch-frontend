@@ -25,7 +25,7 @@ const Bar = () => {
         <h1 className="worker_hatch">Hatch</h1>
       </div>
       <div className="bar_options_container">
-        <h1 className="Reader" style={{ cursor: 'pointer' }} onClick={handleReaderClick}>Reader</h1>
+        <h1 className="Reader" style={{ cursor: 'pointer' }} onClick={handleReaderClick}>Materials</h1>
         <h1 className="Sign_out" style={{ cursor: 'pointer' }} onClick={handleSignOut}>Sign Out</h1>
       </div>
     </nav>

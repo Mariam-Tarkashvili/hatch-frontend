@@ -1,0 +1,20 @@
+[
+
+  {
+    "id": 1,
+    "title": "Welcome to Training",
+    "image": "/podcast1.png",
+    "audio": "/conversation1.mp3",
+    "description": "An introduction to our onboarding program."
+  },
+  {
+    "id": 2,
+    "title": "Company Culture",
+    "image": "/podcast2.png",
+    "audio": "/conversation2.mp3",
+    "description": "Learn about our company values and culture. Learn about our company values and culture Learn about our company values and culture Learn about our company values and culture"
+  }
+]
+
+
+ 
