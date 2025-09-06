@@ -42,27 +42,39 @@ const Login_page = () => {
       <div className="login_container">
         <h1 className="login_caption">Log in</h1>
         <form onSubmit={handleLogin}>
-          <div className="pretty_inputs">
-            <input 
-              className="username" 
-              placeholder="Work E-mail" 
-              type="email"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-            <input 
-              className="password" 
-              placeholder="Password" 
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          {error && <p className="error_message">{error}</p>}
-          <button className="login_button" type="submit">Sign in</button>
-        </form>
+  <div className="pretty_inputs">
+    <input 
+      className="username" 
+      placeholder="Work E-mail" 
+      type="email"
+      value={username}
+      onChange={(e) => setUsername(e.target.value)}
+      required
+    />
+    <input 
+      className="password" 
+      placeholder="Password" 
+      type="password"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      required
+    />
+  </div>
+  
+  {error && <p className="error_message">{error}</p>}
+  
+  <div className="login_buttons">
+    <button className="login_button" type="submit">Sign In</button>
+    <button 
+      type="button" 
+      className="back_to_landing_btn"
+      onClick={() => navigate('/')}
+    >
+      Back
+    </button>
+  </div>
+</form>
+
       </div>
     </div>
   )

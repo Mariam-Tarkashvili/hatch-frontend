@@ -107,7 +107,7 @@ const Recruiter_interface = () => {
     }
 
     // Navigate back to login page
-    navigate('/');
+    navigate('/login');
   }
 
   const handleDropdownToggle = () => setDropdownOpen(!dropdownOpen)

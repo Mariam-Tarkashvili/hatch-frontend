@@ -4,7 +4,7 @@
 }
 .container{
     height: 100vh;
-    width: 100vw;
+    width: 90vw;
     background-color: rgb(20, 20, 20);
     display: flex;
     flex-direction: column;
@@ -19,7 +19,7 @@
 
 .login_container {
   width: 40%;
-  height: 45%;
+  height: 50%;
   border: 2px solid #5cddfd; 
   border-radius: 10px;        
   padding: 20px;             
@@ -95,4 +95,12 @@ form{
 }
 .error_message{
   color:white;
+}
+.login_buttons{
+  margin-bottom: 100px;
+  margin-top:0px;
+}
+
+.back_to_landing_btn{
+  border: 1px solid #5cddfd;
 }

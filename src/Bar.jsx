@@ -6,14 +6,15 @@ const Bar = () => {
   const navigate = useNavigate()
   const { id: workerId } = useParams()  // ✅ grab workerId from route
 
-  const handleSignOut = async () => {
-    try {
-      await axios.post('http://127.0.0.1:5000/finish_training', {})
-    } catch (err) {
-      console.error("Error finishing training:", err)
-    }
-    navigate('/')
+const handleSignOut = async () => {
+  try {
+    await axios.post('http://127.0.0.1:5000/finish_training', {})
+  } catch (err) {
+    console.error("Error finishing training:", err)
   }
+  navigate('/login')  
+}
+
 
   const handleReaderClick = () => {
     navigate(`/worker/${workerId}/articles`)  // ✅ redirect to Articles
