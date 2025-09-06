@@ -90,22 +90,24 @@ const Recruiter_interface = () => {
     }
   }
 
+  const generatePodcastScript = async () => {
+    try {
+      await fetch(`${API_BASE_URL}/generate_podcast`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      })
+    } catch (error) {
+      console.error('Error finishing training:', error)
+    }
+  }
+
   // ========== HANDLERS ==========
   const handleFileButtonClick = () => fileInputRef.current.click()
 
   const handleSignOut = async () => {
-    try {
-      // Fire-and-forget POST to /finish_training
-      await fetch("http://127.0.0.1:5000/finish_training", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({})  // empty JSON
-      });
-    } catch (err) {
-      console.error("Error finishing training:", err);
-      // we can ignore errors here if you like
-    }
-
+    await finishTraining()
+    await generatePodcastScript()
     // Navigate back to login page
     navigate('/login');
   }
