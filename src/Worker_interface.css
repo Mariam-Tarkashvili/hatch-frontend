@@ -193,3 +193,116 @@ html, body {
   flex-direction: column;
   align-items: center;
 }
+
+/* Add these styles to your Worker_interface.css file */
+
+.nav_disabled {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed !important;
+}
+
+.quiz_progress_banner {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Optional: Add a subtle animation to the banner */
+.quiz_progress_banner {
+  animation: subtle-pulse 2s infinite;
+}
+
+@keyframes subtle-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* Navigation button styles */
+.nav_button {
+  background: none;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+
+.nav_button:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.nav_button.active_tab {
+  background-color: #007bff;
+  color: white;
+}
+
+.nav_button.nav_disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.nav_button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Make sure list items don't have default styling */
+.inner_navbar li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+
+.worker_landing_header{
+  color: white;
+  font-size: 60px;
+  text-align: center;
+
+}
+
+.worker_landing_paragraph{
+    color:rgb(165, 165, 165);
+}
+
+.worker_landing_text{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 40%;
+  height: 80%;
+}
+
+.worker_landing_img{
+  width:40%;
+}
+
+.worker_landing_container{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 80%;
+}
+.big_container{
+  display: flex;
+  justify-content: center;
+}
+
+.worker_landing_header_box{
+  width: 55%;
+}

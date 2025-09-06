@@ -5,6 +5,7 @@ import './Quiz_box.css'
 const Quiz_box = () => {
   const [quiz, setQuiz] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [selectedAnswers, setSelectedAnswers] = useState({}) // store user's answers
   const [lockedQuestions, setLockedQuestions] = useState({}) // track which questions are locked
   const [showResults, setShowResults] = useState(false)
@@ -12,14 +13,26 @@ const Quiz_box = () => {
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const res = await axios.get('/quiz.json')
-        setQuiz(res.data.quiz)
+        setLoading(true)
+        setError(null)
+        
+        // Call your Flask backend endpoint
+        const res = await axios.get('http://127.0.0.1:5000/generate_quiz')
+        
+        // Check if the response has the expected structure
+        if (res.data && res.data.quiz && Array.isArray(res.data.quiz)) {
+          setQuiz(res.data.quiz)
+        } else {
+          throw new Error('Invalid quiz format received from server')
+        }
       } catch (err) {
         console.error("Error fetching quiz:", err)
+        setError(err.response?.data?.error || err.message || 'Failed to load quiz')
       } finally {
         setLoading(false)
       }
     }
+    
     fetchQuiz()
   }, [])
 
@@ -46,6 +59,12 @@ const Quiz_box = () => {
     setShowResults(true)
   }
 
+  const handleRetakeQuiz = () => {
+    setSelectedAnswers({})
+    setLockedQuestions({})
+    setShowResults(false)
+  }
+
   const isAnswered = (qIndex) => {
     return lockedQuestions[qIndex]
   }
@@ -62,7 +81,44 @@ const Quiz_box = () => {
     return quiz.length > 0 && Object.keys(selectedAnswers).length === quiz.length
   }
 
-  if (loading) return <p>Loading quiz...</p>
+  // Loading state
+  if (loading) {
+    return (
+      <div className="quiz_box_container">
+        <div className="quiz_loading">
+          <p className="loading_quiz">Generating your personalized quiz...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="quiz_box_container">
+        <div className="quiz_error">
+          <p>⚠️ Error loading quiz: {error}</p>
+          <button 
+            className="retry_btn" 
+            onClick={() => window.location.reload()}
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Empty quiz state
+  if (!quiz || quiz.length === 0) {
+    return (
+      <div className="quiz_box_container">
+        <div className="quiz_empty">
+          <p>No quiz questions available at this time.</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="quiz_box_container">
@@ -74,7 +130,6 @@ const Quiz_box = () => {
               const isSelected = isSelectedAnswer(index, ans)
               const isCorrect = isCorrectAnswer(index, ans)
               const questionAnswered = isAnswered(index)
-              const userSelectedWrong = questionAnswered && isSelected && !isCorrect
 
               // Determine button class
               let buttonClass = "quiz_answer_btn"
@@ -128,6 +183,9 @@ const Quiz_box = () => {
             <p className="score_percentage">
               ({Math.round((calculateScore() / quiz.length) * 100)}%)
             </p>
+            <button className="retake_quiz_btn" onClick={handleRetakeQuiz}>
+              Retake Quiz
+            </button>
           </div>
         </div>
       )}

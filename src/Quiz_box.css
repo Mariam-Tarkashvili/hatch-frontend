@@ -12,6 +12,7 @@
   border: 1px solid #5cddfd;
   margin-left: 50px;
   width: 100%;
+  margin-bottom: 20px;
 }
 
 .quiz_question {
@@ -132,4 +133,31 @@
   font-size: 16px;
   color: #a0a0a0;
   margin-top: 10px;
+}
+
+.quiz_loading, .quiz_error, .quiz_empty {
+  text-align: center;
+  padding: 2rem;
+  margin: 1rem 0;
+}
+
+.quiz_error {
+  color: #d32f2f;
+}
+
+.retry_btn, .retake_quiz_btn {
+  background-color: #5cddfd;
+  color:rgb(20, 20, 20);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.retry_btn:hover, .retake_quiz_btn:hover {
+  background-color: #1565c0;
+}
+.loading_quiz{
+  color: rgb(165, 165, 165);
 }

@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
-import { NavLink, Routes, Route, useParams } from 'react-router-dom'
+import { NavLink, Routes, Route, useParams, useLocation } from 'react-router-dom'
 import Podcast_box from './Podcast_box'
 import Quiz_box from './Quiz_box'  // <-- import Quiz_box
 import './Worker_interface.css'
 
 const Worker_interface = () => {
   const { id: workerId } = useParams()
+  const location = useLocation()
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [messages, setMessages] = useState([
     { text: "Hello! Ask me about your training material.", sender: "bot" }
@@ -14,6 +15,7 @@ const Worker_interface = () => {
   const [inputValue, setInputValue] = useState("")
   const [wallText, setWallText] = useState("")
   const [loading, setLoading] = useState(true)
+  const [quizInProgress, setQuizInProgress] = useState(false)
   const messagesEndRef = useRef(null)
 
   useEffect(() => {
@@ -53,6 +55,27 @@ const Worker_interface = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
+  // Check if current route is quiz
+  const isQuizRoute = location.pathname.includes('/quiz')
+  
+  // Show chatbot only on articles and podcasts routes
+  const shouldShowChatbot = !isQuizRoute
+
+  // Handle quiz progress updates from Quiz_box component
+  const handleQuizProgressChange = (inProgress) => {
+    setQuizInProgress(inProgress)
+  }
+
+  // Handle navigation click - prevent if quiz is in progress
+  const handleNavClick = (e, path) => {
+    if (quizInProgress && !path.includes('/quiz')) {
+      e.preventDefault()
+      alert('Please finish your current quiz before navigating to other sections.')
+      return false
+    }
+    return true
+  }
+
   return (
     <div className="worker_container">
       <div className="materials_container">
@@ -61,7 +84,14 @@ const Worker_interface = () => {
           <li>
             <NavLink
               to={`/worker/${workerId}/articles`}
-              className={({ isActive }) => isActive ? "active_tab" : ""}
+              className={({ isActive }) => {
+                let className = isActive ? "active_tab" : ""
+                if (quizInProgress && !location.pathname.includes('/quiz')) {
+                  className += " nav_disabled"
+                }
+                return className
+              }}
+              onClick={(e) => handleNavClick(e, `/worker/${workerId}/articles`)}
             >
               Articles
             </NavLink>
@@ -69,7 +99,14 @@ const Worker_interface = () => {
           <li>
             <NavLink
               to={`/worker/${workerId}/podcasts`}
-              className={({ isActive }) => isActive ? "active_tab" : ""}
+              className={({ isActive }) => {
+                let className = isActive ? "active_tab" : ""
+                if (quizInProgress && !location.pathname.includes('/quiz')) {
+                  className += " nav_disabled"
+                }
+                return className
+              }}
+              onClick={(e) => handleNavClick(e, `/worker/${workerId}/podcasts`)}
             >
               Podcasts
             </NavLink>
@@ -84,8 +121,35 @@ const Worker_interface = () => {
           </li>
         </ul>
 
+        {/* Quiz progress indicator */}
+        {quizInProgress && (
+          <div className="quiz_progress_banner">
+            📝 Quiz in progress - Please complete all questions before navigating elsewhere
+          </div>
+        )}
+
         {/* Nested routes */}
         <Routes>
+           {/* Default landing page */}
+  <Route
+    index
+    element={
+      <div className="big_container">
+      <div className="worker_landing_container">
+        <div className="worker_landing_text">
+        
+        <h1 className="worker_landing_header">Welcome to Hatch</h1>
+        
+        <p className="worker_landing_paragraph">This is your training workspace.
+          Select a tab above to get started with articles, podcasts, or your daily quiz.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nulla vitae posuere blandit, eros mauris aliquet justo, vel euismod justo arcu a est. Integer feugiat, nibh nec sollicitudin posuere, nunc turpis aliquet odio, vitae tincidunt erat mauris nec lacus. Proin dapibus nulla id quam imperdiet, nec mattis libero efficitur. Duis luctus odio id fermentum</p>
+          </div>
+          
+            <img className="worker_landing_img" src="/worker_landing.png" alt="workplace"/>
+         </div>
+      </div>
+    }
+  />
           <Route
             path="articles"
             element={
@@ -112,49 +176,51 @@ const Worker_interface = () => {
             element={
               <div className="quiz_container">
                 <h1 className="worker_text_title">Daily Quiz</h1>
-                <Quiz_box />  {/* <-- render quiz questions here */}
+                <Quiz_box onQuizProgressChange={handleQuizProgressChange} />
               </div>
             }
           />
         </Routes>
       </div>
 
-      {/* Chatbot Button / Box */}
-      <div className="chatbot_container">
-        {isChatOpen ? (
-          <div className="chatbox">
-            <div className="chatbox_header">
-              <span>Assistant</span>
-              <button onClick={() => setIsChatOpen(false)}>✕</button>
+      {/* Chatbot Button / Box - Only show on articles and podcasts routes */}
+      {shouldShowChatbot && (
+        <div className="chatbot_container">
+          {isChatOpen ? (
+            <div className="chatbox">
+              <div className="chatbox_header">
+                <span className="assistant">Assistant</span>
+                <button onClick={() => setIsChatOpen(false)}>✕</button>
+              </div>
+              <div className="chatbox_body">
+                {messages.map((msg, index) => (
+                  <div
+                    key={index}
+                    className={`chat_message ${msg.sender === "user" ? "sent" : "received"}`}
+                  >
+                    {msg.text}
+                  </div>
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+              <div className="chatbox_footer">
+                <input
+                  type="text"
+                  placeholder="Type a message..."
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                />
+                <button onClick={handleSend}>➤</button>
+              </div>
             </div>
-            <div className="chatbox_body">
-              {messages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`chat_message ${msg.sender === "user" ? "sent" : "received"}`}
-                >
-                  {msg.text}
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
-            <div className="chatbox_footer">
-              <input
-                type="text"
-                placeholder="Type a message..."
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              />
-              <button onClick={handleSend}>➤</button>
-            </div>
-          </div>
-        ) : (
-          <button className="chatbot_button" onClick={() => setIsChatOpen(true)}>
-            <img src="/white_logo.png" alt="Chatbot" className="chatbot_icon"/>
-          </button>
-        )}
-      </div>
+          ) : (
+            <button className="chatbot_button" onClick={() => setIsChatOpen(true)}>
+              <img src="/white_logo.png" alt="Chatbot" className="chatbot_icon"/>
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }

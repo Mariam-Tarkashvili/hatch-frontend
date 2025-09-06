@@ -1,9 +1,10 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
 import './Bar.css';
 
 const Bar = () => {
   const navigate = useNavigate()
+  const { id: workerId } = useParams()  // ✅ grab workerId from route
 
   const handleSignOut = async () => {
     try {
@@ -15,13 +16,17 @@ const Bar = () => {
   }
 
   const handleReaderClick = () => {
-    console.log('Reader clicked - content already shown')
+    navigate(`/worker/${workerId}/articles`)  // ✅ redirect to Articles
+  }
+
+  const handleLogoClick = () => {
+    navigate(`/worker/${workerId}`)  // ✅ go to landing page
   }
 
   return (
     <nav className="bar">
-      <div className="bar_logo_container">
-        <img src="/logo.png" alt="Logo" className="worker_logo" style={{ cursor: 'pointer' }}/>
+      <div className="bar_logo_container" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
+        <img src="/logo.png" alt="Logo" className="worker_logo"/>
         <h1 className="worker_hatch">Hatch</h1>
       </div>
       <div className="bar_options_container">
